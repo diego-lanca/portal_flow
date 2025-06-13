@@ -20,7 +20,7 @@ class UserRepository {
 
   Future<User?> fetchUser() async {
     try {
-      final token = await _tokenRepository.getToken();
+      final token = await _tokenRepository.token;
 
       if (token != null) {
         final jwt = JWT.decode(token);
@@ -28,6 +28,8 @@ class UserRepository {
         final user = User.fromToken(jwt.payload as Map<String, dynamic>);
         return user;
       }
+
+      return null;
 
     } on Exception catch (e) {
       debugPrint(e.toString());

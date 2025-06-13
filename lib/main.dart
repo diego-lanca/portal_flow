@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:portal_flow/core/core.dart';
 import 'package:portal_flow/data/data.dart';
-import 'package:portal_flow/data/repositories/token_repository.dart';
+import 'package:portal_flow/data/repositories/invoice_repository.dart';
 import 'package:portal_flow/features/auth/auth.dart';
-import 'package:portal_flow/features/home/home.dart';
 import 'package:portal_flow/features/login/login.dart';
+import 'package:portal_flow/features/main/main.dart';
 import 'package:portal_flow/features/splash/splash.dart';
+import 'package:portal_flow/shared/utils/theme/theme.dart';
 
 void main() {
   runApp(const App());
@@ -27,6 +28,7 @@ class App extends StatelessWidget {
         RepositoryProvider(
           create: (context) => UserRepository(context.read<TokenRepository>()),
         ),
+        RepositoryProvider(create: (context) => InvoiceRepository(),)
       ],
       child: BlocProvider(
         lazy: false,
@@ -56,6 +58,8 @@ class _AppViewState extends State<AppView> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       navigatorKey: _navigatorKey,
       builder: (context, child) {
         return BlocListener<AuthBloc, AuthState>(
@@ -65,7 +69,7 @@ class _AppViewState extends State<AppView> {
                 break;
               case AuthStatus.authenticated:
                 _navigator.pushAndRemoveUntil<void>(
-                  HomePage.route(),
+                  MainPage.route(context.read<InvoiceRepository>()),
                   (route) => false,
                 );
               case AuthStatus.unauthenticated:

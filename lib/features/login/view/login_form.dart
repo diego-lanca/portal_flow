@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:portal_flow/features/login/bloc/login_bloc.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<LoginBloc, LoginState>(
@@ -49,6 +50,7 @@ class _UsernameInput extends StatelessWidget {
       },
       decoration: InputDecoration(
         labelText: 'Email',
+        prefixIcon: const Icon(LucideIcons.sendHorizontal),
         errorText: displayError != null ? 'Email inválido' : null,
       ),
     );
@@ -70,6 +72,7 @@ class _PasswordInput extends StatelessWidget {
       obscureText: true,
       decoration: InputDecoration(
         labelText: 'Senha',
+        prefixIcon: const Icon(LucideIcons.lockKeyhole),
         errorText: displayError != null ? 'Senha inválida' : null,
       ),
     );

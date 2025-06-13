@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:portal_flow/data/data.dart';
-import 'package:portal_flow/data/repositories/token_repository.dart';
 import 'package:portal_flow/features/login/bloc/login_bloc.dart';
 import 'package:portal_flow/features/login/view/login_form.dart';
 
@@ -25,6 +24,9 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset('assets/images/contabil-logo-horizontal.png'),
+                  const SizedBox(
+                    height: 10
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: BlocProvider(

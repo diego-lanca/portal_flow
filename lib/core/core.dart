@@ -1,2 +1,2 @@
-export 'enums/enums.dart';
 export 'config/config.dart';
+export 'enums/enums.dart';

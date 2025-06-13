@@ -1,33 +1,18 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:portal_flow/core/core.dart';
-import 'package:portal_flow/data/models/auth_response.dart';
+import 'package:portal_flow/data/models/models.dart';
 import 'package:portal_flow/data/repositories/token_repository.dart';
+import 'package:portal_flow/http.dart';
 
 /// Authentication repository
 class AuthRepository {
-  AuthRepository(this._tokenRepository)
-    : _dio = Dio(BaseOptions(baseUrl: Env.apiUrl)) {
-    if (!kReleaseMode) {
-      final adapter = IOHttpClientAdapter();
-      adapter.createHttpClient = () {
-        final client = HttpClient();
-        client.badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
-        return client;
-      };
-
-      _dio.httpClientAdapter = adapter;
-    }
-  }
+  AuthRepository(this._tokenRepository);
 
   final _controller = StreamController<AuthStatus>();
   final TokenRepository _tokenRepository;
-  late final Dio _dio;
 
   Stream<AuthStatus> get status async* {
     await Future<void>.delayed(const Duration(seconds: 1));
@@ -35,24 +20,49 @@ class AuthRepository {
     yield* _controller.stream;
   }
 
+  Future<bool> clientPortalAccess({
+    required String username,
+  }) async {
+    try {
+      final response = await dio.get<Map<String, dynamic>>(
+        'auth/portal',
+        options: Options(
+          headers: {
+            'email': username,
+          },
+        ),
+      );
+
+      // Supondo que o backend retorne algo como { "success": true }
+      return response.data?['success'] == true;
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+      rethrow;
+    }
+  }
+
   Future<void> logIn({
     required String username,
     required String password,
   }) async {
     try {
-      final response = await _dio.post<Map<String, dynamic>>(
+      final response = await dio.post<Map<String, dynamic>>(
         'auth/login',
         data: {'email': username, 'password': password},
       );
 
       if (response.statusCode == 200 && response.data != null) {
         final authResponse = AuthResponse.fromJson(response.data!);
-          await _tokenRepository.setToken(authResponse.token);
+        await _tokenRepository.setToken(authResponse.token);
         _controller.add(AuthStatus.authenticated);
 
         return;
       }
     } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout) {
+        throw Exception('Connection timeout, please contact support');
+      }
+
       throw Exception('Connection error $e');
     } on Exception catch (e) {
       throw Exception(e.toString());

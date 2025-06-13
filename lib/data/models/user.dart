@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
 
 /// Usuário com acesso ao client portal
@@ -9,10 +12,11 @@ class User extends Equatable {
     this.email,
     this.phone,
     this.companyId,
-    this.groupId, 
+    this.groupId,
     this.roles, {
     this.id,
     this.isActive = false,
+    this.profileImage,
   });
 
   /// Empty constructor
@@ -25,7 +29,8 @@ class User extends Equatable {
     this.companyId = 0,
     this.groupId = 0,
     this.isActive = false,
-    this.roles
+    this.roles,
+    this.profileImage,
   });
 
   // factory User.fromJson(Map<String, dynamic> json) {
@@ -43,7 +48,26 @@ class User extends Equatable {
 
   factory User.fromToken(Map<String, dynamic> token) {
     try {
-      final roles = token['role'] as List<dynamic>;
+      var roles = List<dynamic>.empty(growable: true);
+
+      if (token['role'].runtimeType == String) {
+        roles.add(token['role']);
+      } else {
+        roles = token['role'] as List<dynamic>;
+      }
+
+
+      Uint8List decodeBase64String(String value) {
+        final encoded = base64Decode(value);
+        final bytes = Uint8List.fromList(encoded);
+        return bytes;
+      }
+
+      Uint8List? profileImage;
+      if (token.containsKey('profileimage')) {
+        decodeBase64String(token['profileimage'] as String);
+      }
+
       return User(
         token['name'] as String,
         '',
@@ -52,13 +76,14 @@ class User extends Equatable {
         int.parse(token['companyid'] as String),
         0,
         roles.cast<String>(),
-        id: token['nameid'] as String
+        id: token['nameid'] as String,
+        profileImage: profileImage,
       );
     } on Exception catch (_) {
       rethrow;
-    } 
+    }
   }
-  
+
   ///User props
   final String? id;
   final String name;
@@ -69,7 +94,7 @@ class User extends Equatable {
   final int companyId;
   final int groupId;
   final bool isActive;
-  // final String? profileImage;
+  final Uint8List? profileImage;
 
   @override
   List<Object> get props => [
@@ -82,5 +107,4 @@ class User extends Equatable {
     groupId,
     isActive,
   ];
-
 }

@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 import 'package:portal_flow/data/data.dart';
-import 'package:portal_flow/data/repositories/token_repository.dart';
 import 'package:portal_flow/features/login/models/models.dart';
 
 part 'login_event.dart';
@@ -12,7 +11,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc({
     required AuthRepository authRepository,
     required UserRepository userRepository,
-    required TokenRepository tokenRepository
+    required TokenRepository tokenRepository,
   }) : _authRepository = authRepository,
        _userRepository = userRepository,
        _tokenRepository = tokenRepository,
@@ -59,18 +58,28 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     if (state.isValid) {
       emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
       try {
-        await _authRepository.logIn(
+        final clientPortal = await _authRepository.clientPortalAccess(
           username: state.username.value,
-          password: state.password.value,
         );
 
-        emit(state.copyWith(status: FormzSubmissionStatus.success));
+        if (clientPortal) {
+          await _authRepository.logIn(
+            username: state.username.value,
+            password: state.password.value,
+          );
+
+          emit(state.copyWith(status: FormzSubmissionStatus.success));
+        } else {
+          emit(state.copyWith(status: FormzSubmissionStatus.failure));
+        }
+
         // Fails
         // ignore: avoid_catches_without_on_clauses
       } catch (_) {
         await _tokenRepository.clearToken();
         _userRepository.clearUser();
         emit(state.copyWith(status: FormzSubmissionStatus.failure));
+        emit(state.copyWith(status: FormzSubmissionStatus.canceled));
       }
     }
   }
