@@ -12,7 +12,7 @@ class InvoiceRepository {
 
 Future<List<Invoice>> _getInvoices() async {
   try {
-    final response = await dio.get<List<dynamic>>('invoice/client/0');
+    final response = await dio.get<List<dynamic>>('invoice/client');
 
     if (response.data != null) {
       final invoices = response.data!.map(

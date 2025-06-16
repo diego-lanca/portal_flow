@@ -28,38 +28,30 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  flutter:
-    sdk: flutter
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  accordion: ^2.6.0
   bloc: ^9.0.0
   cupertino_icons: ^1.0.8
   dart_jsonwebtoken: ^3.2.0
   dio: ^5.8.0+1
   envied: ^1.1.1
   equatable: ^2.0.7
+  flutter:
+    sdk: flutter
   flutter_bloc: ^9.1.1
   formz: ^0.8.0
-  get_it: ^8.0.3
-  shared_preferences: ^2.5.3
-  accordion: ^2.6.0
-  lucide_icons_flutter: ^3.0.5
   intl: ^0.20.2
+  lucide_icons_flutter: ^3.0.5
+  open_filex: ^4.7.0
+  path_provider: ^2.1.5
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   bloc_lint: ^0.2.0-dev
   build_runner: ^2.4.15
   envied_generator: ^1.1.1
   flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
   very_good_analysis: ^9.0.0
 
 # For information on the generic Dart part of this file, see the

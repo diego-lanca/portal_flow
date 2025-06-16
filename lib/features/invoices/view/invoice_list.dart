@@ -1,23 +1,35 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:accordion/accordion.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:portal_flow/core/core.dart';
 import 'package:portal_flow/data/data.dart';
 import 'package:portal_flow/features/invoices/bloc/invoice_bloc.dart';
 
 class InvoiceList extends StatelessWidget {
-  const InvoiceList({this.invoiceFilter = InvoiceFilter.all, super.key});
+  const InvoiceList({
+    this.invoiceFilter = InvoiceFilter.all,
+    this.isSearchable = false,
+    super.key,
+  });
 
   final InvoiceFilter invoiceFilter;
+  final bool isSearchable;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<InvoiceBloc, InvoiceState>(
       builder: (context, state) {
-        final invoices = state.filteredInvoices(invoiceFilter);
+        final invoices = isSearchable
+            ? state.filteredSearchInvoices(invoiceFilter)
+            : state.filteredInvoices(invoiceFilter);
 
         if (state.invoices.isEmpty) {
           if (state.status == InvoiceLoadStatus.loading) {
@@ -45,7 +57,7 @@ class InvoiceList extends StatelessWidget {
 
                 return Padding(
                   padding: const EdgeInsetsGeometry.symmetric(vertical: 8),
-                  child: InvoiceCard(invoice: invoice),
+                  child: _InvoiceCard(invoice: invoice),
                 );
               },
             ),
@@ -56,15 +68,15 @@ class InvoiceList extends StatelessWidget {
   }
 }
 
-class InvoiceCard extends StatelessWidget {
-  InvoiceCard({required this.invoice, super.key});
+class _InvoiceCard extends StatelessWidget {
+  _InvoiceCard({required this.invoice});
 
   final format = DateFormat('dd/MM/yyyy');
   final Invoice invoice;
 
   @override
   Widget build(BuildContext context) {
-    final daysToOverdue = invoice.dueDate!.day - DateTime.now().day;
+    final daysToOverdue = invoice.dueDate.day - DateTime.now().day;
 
     return Container(
       decoration: BoxDecoration(
@@ -104,20 +116,26 @@ class InvoiceCard extends StatelessWidget {
                             fontSize: 18,
                           ),
                         ),
-                        if (daysToOverdue > 0)
-                          Text(
-                            'Vence em $daysToOverdue dias',
-                            style: const TextStyle(fontSize: 16),
-                          )
-                        else if (daysToOverdue == 0)
-                          const Text(
-                            'Vence hoje',
-                            style: TextStyle(fontSize: 16),
-                          )
+                        if (invoice.status != InvoiceStatus.paid)
+                          if (daysToOverdue > 0)
+                            Text(
+                              'Vence em $daysToOverdue dias',
+                              style: const TextStyle(fontSize: 16),
+                            )
+                          else if (daysToOverdue == 0)
+                            const Text(
+                              'Vence hoje',
+                              style: TextStyle(fontSize: 16),
+                            )
+                          else
+                            Text(
+                              'Venceu hà ${-daysToOverdue} dias',
+                              style: const TextStyle(fontSize: 16),
+                            )
                         else
-                          Text(
-                            'Venceu hà ${-daysToOverdue} dias',
-                            style: const TextStyle(fontSize: 16),
+                          const Text(
+                            'Finalizado',
+                            style: TextStyle(fontSize: 16),
                           ),
                       ],
                     ),
@@ -133,6 +151,8 @@ class InvoiceCard extends StatelessWidget {
             paddingListHorizontal: 0,
             paddingBetweenClosedSections: 0,
             paddingBetweenOpenSections: 0,
+
+            disableScrolling: true,
 
             children: [
               AccordionSection(
@@ -162,25 +182,7 @@ class InvoiceCard extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
 
-                content: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Nome: ${invoice.fileName}'),
-                    Text(
-                      'Vencimento: ${format.format(invoice.dueDate ?? DateTime.now())}',
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: () => {},
-                          label: const Text('Baixar'),
-                          icon: const Icon(LucideIcons.download),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                content: _InvoiceAccordionContent(invoice: invoice),
               ),
             ],
           ),
@@ -255,5 +257,51 @@ class InvoiceCard extends StatelessWidget {
           ),
         );
     }
+  }
+}
+
+class _InvoiceAccordionContent extends StatelessWidget {
+  const _InvoiceAccordionContent({required this.invoice});
+
+  final Invoice invoice;
+
+  @override
+  Widget build(BuildContext context) {
+    final format = DateFormat('dd/MM/yyyy');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Nome: ${invoice.fileName}'),
+        Text(
+          'Vencimento: ${format.format(invoice.dueDate)}',
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            ElevatedButton.icon(
+              onPressed: () async {
+                final path = await _createFileFromString(invoice.bill);
+
+                await OpenFilex.open(path);
+              },
+              label: const Text('Baixar'),
+              icon: const Icon(LucideIcons.download),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Future<String> _createFileFromString(String encoded) async {
+    final bytes = base64.decode(encoded);
+    final dir = (await getApplicationDocumentsDirectory()).path;
+
+    final file = File('$dir/${DateTime.now().millisecondsSinceEpoch}.pdf');
+
+    await file.writeAsBytes(bytes);
+
+    return file.path;
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:portal_flow/core/core.dart';
 import 'package:portal_flow/features/auth/auth.dart';
 import 'package:portal_flow/features/invoices/bloc/invoice_bloc.dart';
 import 'package:portal_flow/features/invoices/view/invoice_list.dart';
@@ -49,7 +50,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// Versão alternativa mais compacta do header
 class _HomeHeader extends StatelessWidget {
   const _HomeHeader();
 

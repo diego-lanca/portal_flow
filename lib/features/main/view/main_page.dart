@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:portal_flow/core/core.dart';
-import 'package:portal_flow/data/repositories/invoice_repository.dart';
+import 'package:portal_flow/data/data.dart';
 import 'package:portal_flow/features/home/view/home_page.dart';
 import 'package:portal_flow/features/invoices/bloc/invoice_bloc.dart';
-import 'package:portal_flow/features/main/main.dart';
+import 'package:portal_flow/features/invoices/view/invoice_page.dart';
+import 'package:portal_flow/features/main/cubit/main_cubit.dart';
 import 'package:portal_flow/features/settings/view/settings_page.dart';
 
 class MainPage extends StatelessWidget {
@@ -67,7 +68,7 @@ class MainPage extends StatelessWidget {
       case MainTab.home:
         return const HomePage();
       case MainTab.historic:
-        return const Text('Histórico');
+        return const InvoicePage();
       case MainTab.config:
         return const SettingsPage();
     }

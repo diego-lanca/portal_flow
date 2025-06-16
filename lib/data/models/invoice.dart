@@ -3,13 +3,13 @@ import 'package:portal_flow/core/core.dart';
 
 class Invoice extends Equatable {
   const Invoice({
+    required this.dueDate,
     this.id = 0,
     this.customerAccount = '',
     this.reference,
     this.fileName = '',
     this.bankSlip,
     this.bill = '',
-    this.dueDate,
     this.status = InvoiceStatus.pending,
   });
 
@@ -32,7 +32,7 @@ class Invoice extends Equatable {
   final String fileName;
   final String? bankSlip; // Base64
   final String bill; // Base64
-  final DateTime? dueDate;
+  final DateTime dueDate;
   final InvoiceStatus status;
 
   @override
