@@ -28,7 +28,13 @@ class LoginForm extends StatelessWidget {
             const Padding(padding: EdgeInsets.all(12)),
             _PasswordInput(),
             const Padding(padding: EdgeInsets.all(12)),
-            _LoginButton(),
+            Row(
+              children: [
+                Expanded(
+                  child: _LoginButton(),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -50,7 +56,7 @@ class _UsernameInput extends StatelessWidget {
       },
       decoration: InputDecoration(
         labelText: 'Email',
-        prefixIcon: const Icon(LucideIcons.sendHorizontal),
+        labelStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
         errorText: displayError != null ? 'Email inválido' : null,
       ),
     );
@@ -72,7 +78,7 @@ class _PasswordInput extends StatelessWidget {
       obscureText: true,
       decoration: InputDecoration(
         labelText: 'Senha',
-        prefixIcon: const Icon(LucideIcons.lockKeyhole),
+        labelStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
         errorText: displayError != null ? 'Senha inválida' : null,
       ),
     );
@@ -95,7 +101,15 @@ class _LoginButton extends StatelessWidget {
       onPressed: isValid
           ? () => context.read<LoginBloc>().add(const LoginSubmitted())
           : null,
-      child: const Text('Entrar'),
+      child: const SizedBox(
+        height: 51,
+        child: Center(
+          child: Text(
+            'Entrar',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ),
     );
   }
 }

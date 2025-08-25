@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 import 'package:portal_flow/data/data.dart';
@@ -74,8 +75,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         }
 
         // Fails
-        // ignore: avoid_catches_without_on_clauses
-      } catch (_) {
+      } on DioException catch (e) {
         await _tokenRepository.clearToken();
         _userRepository.clearUser();
         emit(state.copyWith(status: FormzSubmissionStatus.failure));

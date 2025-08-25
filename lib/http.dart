@@ -1,10 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:portal_flow/core/core.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthInterceptor extends Interceptor {
   const AuthInterceptor();
@@ -22,8 +23,8 @@ class AuthInterceptor extends Interceptor {
   }
 
   Future<String?> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
+    const storage = FlutterSecureStorage();
+    return storage.read(key: 'auth_token');
   }
 }
 
@@ -32,7 +33,7 @@ Dio createDioClient() {
     BaseOptions(
       baseUrl: Env.apiUrl,
     ),
-  )..interceptors.add(const AuthInterceptor());
+  )..interceptors.add(AuthInterceptor());
 
   if (kDebugMode) {
     dio.interceptors.add(LogInterceptor(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:portal_flow/data/data.dart';
 import 'package:portal_flow/features/login/bloc/login_bloc.dart';
 import 'package:portal_flow/features/login/view/login_form.dart';
@@ -13,6 +14,7 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const assetName = 'assets/images/fiea_pay_logo.svg';
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -23,9 +25,19 @@ class LoginPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('assets/images/contabil-logo-horizontal.png'),
+                  SvgPicture.asset(assetName, semanticsLabel: 'Fiea Logo',),
                   const SizedBox(
-                    height: 10
+                    height: 45
+                  ),
+                  const Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 47
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16),

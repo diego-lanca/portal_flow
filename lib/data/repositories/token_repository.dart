@@ -1,27 +1,25 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:portal_flow/core/config/config.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class TokenRepository {
+  FlutterSecureStorage storage = const FlutterSecureStorage();
+
   Future<void> setToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('auth_token', token);
+    await storage.write(key: 'auth_token', value: token);
   }
 
   Future<String?> get token async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
+    return storage.read(key: 'auth_token');
   }
 
   Future<void> clearToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token');
+    await storage.delete(key: 'auth_token');
   }
 
   Future<bool> get hasToken async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.containsKey('auth_token');
+    return storage.containsKey(key: 'auth_token');
   }
 
   Future<bool> get isTokenExpired async {
